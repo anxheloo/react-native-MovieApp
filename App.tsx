@@ -6,6 +6,7 @@
  */
 
 import React from 'react';
+import {NavigationContainer} from '@react-navigation/native';
 import type {PropsWithChildren} from 'react';
 import {
   SafeAreaView,
@@ -16,6 +17,7 @@ import {
   useColorScheme,
   View,
 } from 'react-native';
+import CustomIcon from './src/components/CustomIcon';
 
 import {
   Colors,
@@ -24,6 +26,13 @@ import {
   LearnMoreLinks,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
+
+import {
+  upcomingMovie,
+  popularMovies,
+  nowPlayingMovies,
+  searchMovies,
+} from './src/api/apicalls';
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -55,12 +64,16 @@ function Section({children, title}: SectionProps): JSX.Element {
   );
 }
 
+// const Stack = createNativeStackNavigator();
+
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
+
+  console.log(searchMovies('Avengers'));
 
   return (
     <SafeAreaView style={backgroundStyle}>
@@ -72,6 +85,8 @@ function App(): JSX.Element {
         contentInsetAdjustmentBehavior="automatic"
         style={backgroundStyle}>
         <Header />
+        <CustomIcon name="search" size={25}></CustomIcon>
+        <CustomIcon name="ticket" size={25}></CustomIcon>
         <View
           style={{
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
