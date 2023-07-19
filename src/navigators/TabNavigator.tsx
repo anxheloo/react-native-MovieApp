@@ -19,7 +19,7 @@ const TabNavigator = () => {
         tabBarStyle: {
           backgroundColor: COLORS.Black,
           borderTopWidth: 0,
-          height: SPACING.space_10 * 10,
+          height: SPACING.space_10 * 8,
         },
       }}>
       <Tab.Screen
@@ -41,7 +41,7 @@ const TabNavigator = () => {
               </View>
             );
           },
-        }} //remove the label below the icon
+        }}
       />
       <Tab.Screen
         name="Search"
