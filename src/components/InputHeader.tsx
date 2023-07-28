@@ -22,7 +22,7 @@ const InputHeader = props => {
     <View style={styles.inputBox}>
       <TextInput
         style={styles.textInput}
-        onChange={text => {
+        onChangeText={text => {
           setSearchText(text);
         }}
         value={searchtext}

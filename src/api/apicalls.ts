@@ -19,5 +19,7 @@ export const movieDetails = (id: number) => {
 };
 
 export const moviecastDetails = (id: number) => {
-  return ` https://api.themoviedb.org/3/movie/${id}/credits?api_key=${apikey}`;
+  return `https://api.themoviedb.org/3/movie/${id}/credits?api_key=${apikey}`;
 };
+
+//  https://api.themoviedb.org/3/movie/12/credits?api_key=671b47eabb6f61040c310bd6f1b681fb
