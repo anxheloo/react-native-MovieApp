@@ -39,7 +39,7 @@ interface Color {
   DarkGrey: string;
   Yellow: string;
   White: string;
-  WhtieRGBA75: string;
+  WhiteRGBA75: string;
   WhiteRGBA50: string;
   WhiteRGBA32: string;
   WhiteRGBA15: string;
@@ -54,7 +54,7 @@ export const COLORS: Color = {
   DarkGrey: '#0b0b0b',
   Yellow: '#E1CD17',
   White: '#FFFFFF',
-  WhtieRGBA75: 'rgba(255,255,255,0.75)',
+  WhiteRGBA75: 'rgba(255,255,255,0.75)',
   WhiteRGBA50: 'rgba(255,255,255,0.50)',
   WhiteRGBA32: 'rgba(255,255,255,0.32)',
   WhiteRGBA15: 'rgba(255,255,255,0.15)',
