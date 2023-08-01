@@ -7,11 +7,22 @@ import {
   StatusBar,
   ImageBackground,
   TouchableOpacity,
+  FlatList,
+  ToastAndroid,
 } from 'react-native';
-import {COLORS, FONTFAMILY, FONTSIZE, SPACING} from '../theme/theme';
+import {
+  BORDERRADIUS,
+  COLORS,
+  FONTFAMILY,
+  FONTSIZE,
+  SPACING,
+} from '../theme/theme';
 import LinearGradient from 'react-native-linear-gradient';
 import AppHeader from '../components/AppHeader';
 import CustomIcon from '../components/CustomIcon';
+import {SnapshotViewIOSComponent} from 'react-native';
+import EncryptedStorage from 'react-native-encrypted-storage';
+// import EncryptedStorage from 'react-native-encrypted-storage/lib/typescript/EncryptedStorage';
 
 const timeArray = ['10:30', '12:30', '14:30', '15:00', '19:30', '21:00'];
 
@@ -41,7 +52,7 @@ const generateSeats = () => {
 
   for (let i = 0; i < numRow; i++) {
     let columnArray = [];
-
+    console.log(i);
     for (let j = 0; j < numColumn; j++) {
       let seatObject = {
         number: start,
@@ -99,7 +110,45 @@ const SeatBookingScreen = ({navigation, route}) => {
     }
   };
 
-  console.log(JSON.stringify(twoDSeatArray, null, 2));
+  const BookSeats = async () => {
+    if (
+      selectedSeatArray.length != 0 &&
+      timeArray[selectedTimeIndex] != undefined &&
+      dateArray[selectedDateIndex] != undefined
+    ) {
+      try {
+        await EncryptedStorage.setItem(
+          'ticket',
+          JSON.stringify({
+            seatArray: selectedSeatArray,
+            time: timeArray[selectedTimeIndex],
+            date: dateArray[selectedDateIndex],
+            ticketImage: route.params.PosterImage,
+          }),
+        );
+      } catch (error) {
+        console.error(
+          'Something went wrong while storing in BookSeats Functions',
+          error,
+        );
+      }
+
+      navigation.navigate('Ticket', {
+        seatArray: selectedSeatArray,
+        time: timeArray[selectedTimeIndex],
+        date: dateArray[selectedDateIndex],
+        ticketImage: route.params.PosterImage,
+      });
+    } else {
+      ToastAndroid.showWithGravity(
+        'Please Select Seats, Date and Time of the Show',
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM,
+      );
+    }
+  };
+
+  // console.log(JSON.stringify(twoDSeatArray, null, 2));
 
   return (
     <ScrollView
@@ -151,6 +200,98 @@ const SeatBookingScreen = ({navigation, route}) => {
             );
           })}
         </View>
+
+        <View style={styles.seatRadioContainer}>
+          <View style={styles.radioContainer}>
+            <CustomIcon name="radio" style={styles.radioIcon}></CustomIcon>
+            <Text style={styles.radioText}>Available</Text>
+          </View>
+          <View style={styles.radioContainer}>
+            <CustomIcon
+              name="radio"
+              style={[styles.radioIcon, {color: COLORS.Grey}]}></CustomIcon>
+            <Text style={styles.radioText}>Taken</Text>
+          </View>
+          <View style={styles.radioContainer}>
+            <CustomIcon
+              name="radio"
+              style={[styles.radioIcon, {color: COLORS.Orange}]}></CustomIcon>
+            <Text style={styles.radioText}>Selected</Text>
+          </View>
+        </View>
+      </View>
+
+      <View>
+        <FlatList
+          data={dateArray}
+          key={item => item.date}
+          horizontal
+          bounces={false}
+          contentContainerStyle={styles.containerGap24}
+          renderItem={({item, index}) => {
+            return (
+              <TouchableOpacity onPress={() => setSelectedDateIndex(index)}>
+                <View
+                  style={[
+                    styles.dateContainer,
+                    index == 0
+                      ? {marginLeft: SPACING.space_24}
+                      : index == dateArray.length - 1
+                      ? {marginRight: SPACING.space_24}
+                      : {},
+                    index == selectedDateIndex
+                      ? {backgroundColor: COLORS.Orange}
+                      : {},
+                  ]}>
+                  <Text style={styles.dateText}>{item.date}</Text>
+                  <Text style={styles.dayText}>{item.day}</Text>
+                </View>
+              </TouchableOpacity>
+            );
+          }}></FlatList>
+      </View>
+
+      <View style={styles.outterContainer}>
+        <FlatList
+          data={timeArray}
+          key={item => item}
+          horizontal
+          bounces={false}
+          contentContainerStyle={styles.containerGap24}
+          renderItem={({item, index}) => {
+            return (
+              <TouchableOpacity onPress={() => setSelectedTimeIndex(index)}>
+                <View
+                  style={[
+                    styles.timeContainer,
+                    index == 0
+                      ? {marginLeft: SPACING.space_24}
+                      : index == dateArray.length - 1
+                      ? {marginRight: SPACING.space_24}
+                      : {},
+                    index == selectedTimeIndex
+                      ? {backgroundColor: COLORS.Orange}
+                      : {},
+                  ]}>
+                  <Text style={styles.timeText}>{item}</Text>
+                </View>
+              </TouchableOpacity>
+            );
+          }}></FlatList>
+      </View>
+
+      <View style={styles.buttonPriceContainer}>
+        <View style={styles.priceContainer}>
+          <Text style={styles.totalPriceText}>Total Price</Text>
+          <Text style={styles.price}>$ {price}.00</Text>
+        </View>
+
+        <TouchableOpacity
+          onPress={() => {
+            BookSeats();
+          }}>
+          <Text style={styles.buttonText}>Buy Tickets</Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
@@ -201,6 +342,111 @@ const styles = StyleSheet.create({
   seatIcon: {
     fontSize: FONTSIZE.size_20,
     color: COLORS.White,
+  },
+
+  seatRadioContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-evenly',
+    marginTop: SPACING.space_36,
+    marginBottom: SPACING.space_10,
+  },
+
+  radioContainer: {
+    flexDirection: 'row',
+    gap: SPACING.space_10,
+    alignItems: 'center',
+  },
+
+  radioIcon: {
+    fontSize: FONTSIZE.size_20,
+    color: COLORS.White,
+  },
+
+  radioText: {
+    fontFamily: FONTFAMILY.poppins_medium,
+    fontSize: FONTSIZE.size_12,
+    color: COLORS.White,
+  },
+
+  containerGap24: {
+    gap: SPACING.space_24,
+  },
+
+  dateContainer: {
+    width: SPACING.space_10 * 7,
+    height: SPACING.space_10 * 10,
+    borderRadius: SPACING.space_10 * 10,
+    backgroundColor: COLORS.DarkGrey,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  dateText: {
+    fontFamily: FONTFAMILY.poppins_medium,
+    fontSize: FONTSIZE.size_24,
+    color: COLORS.White,
+  },
+
+  dayText: {
+    fontFamily: FONTFAMILY.poppins_regular,
+    fontSize: FONTSIZE.size_12,
+    color: COLORS.White,
+  },
+
+  timeContainer: {
+    paddingVertical: SPACING.space_10,
+    paddingHorizontal: SPACING.space_20,
+    borderWidth: 1,
+    borderColor: COLORS.White,
+    borderRadius: BORDERRADIUS.radius_25,
+    backgroundColor: COLORS.DarkGrey,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  timeText: {
+    fontFamily: FONTFAMILY.poppins_regular,
+    fontSize: FONTSIZE.size_14,
+    color: COLORS.White,
+  },
+
+  outterContainer: {
+    marginVertical: SPACING.space_24,
+  },
+
+  buttonPriceContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: SPACING.space_24,
+    paddingBottom: SPACING.space_24,
+  },
+
+  priceContainer: {
+    alignItems: 'center',
+  },
+
+  totalPriceText: {
+    fontFamily: FONTFAMILY.poppins_regular,
+    fontSize: FONTSIZE.size_14,
+    color: COLORS.Grey,
+  },
+
+  price: {
+    fontFamily: FONTFAMILY.poppins_medium,
+    fontSize: FONTSIZE.size_24,
+    color: COLORS.White,
+  },
+
+  buttonText: {
+    borderRadius: BORDERRADIUS.radius_25,
+    paddingHorizontal: SPACING.space_24,
+    paddingVertical: SPACING.space_10,
+    fontFamily: FONTFAMILY.poppins_medium,
+    fontSize: FONTSIZE.size_16,
+    color: COLORS.White,
+    backgroundColor: COLORS.Orange,
   },
 });
 

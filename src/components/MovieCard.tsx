@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
   genreText: {
     fontFamily: FONTFAMILY.poppins_regular,
     fontSize: FONTSIZE.size_10,
-    color: COLORS.WhtieRGBA75,
+    color: COLORS.WhiteRGBA75,
   },
 });
 
